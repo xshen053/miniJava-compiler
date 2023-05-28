@@ -6,9 +6,10 @@
 # factorial function, but does not implement object creation or
 # ordinary methods, as would be done in the regular project.
 
-# This version works on linux.  To make it work on Windows or
-# OS X, leading underscores need to be added to the external
-# names (_asm_main, _put).
+# This version works on linux.  To make it work on Windows or OS X,
+# leading underscores need to be added to the external names (_asm_main,
+# _put).  However, remember that the final version included in your
+# project must work on Allen School Linux machines.
 
 # To run: compile with boot.c then execute/debug/etc.:
 #    gcc <whatever options you want> -o demo demo.s boot.c

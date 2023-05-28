@@ -1,5 +1,5 @@
 This subdirectory contains the CUP (version 0.11b) and jflex (version
-1.6.0) tools used to process the scanner and parser specifications.
+1.8.2) tools used to process the scanner and parser specifications.
 In addition, there are some emacs and vi configuration files taken
 from the jflex distribution that you might find useful when editing
 grammar specifications.
@@ -12,6 +12,10 @@ sometimes useful for error handling and similar customizations (see
 the CUP documentation for detail).  symbol and its subclasses define
 the tokens.
 
+Finally, this directory contains the necessary libraries for running JUnit
+tests, to make it easy for you to write your own tests as you develop
+your compiler.
+
 You should not attempt to compile these files (compiled versions are
 included in the jar files where needed), and the source versions might
 not correspond exactly to the compiled versions.  But they should give
@@ -20,3 +24,5 @@ is helpful.
 
 Otherwise there is no need to look inside this directory or change
 anything in it.
+
+HP, 10/20

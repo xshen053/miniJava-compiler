@@ -2,7 +2,7 @@
  * JFlex specification for lexical analysis of a simple demo language.
  * Change this into the scanner for your implementation of MiniJava.
  *
- * CSE 401/M501/P501 18sp
+ * CSE 401/M501/P501 19au, 20sp, 20au, ...
  */
 
 
@@ -23,7 +23,8 @@ import Parser.sym;
 %line
 %column
 
-/* The following code block is copied literally into the generated scanner
+/* The following code block (delimited by "%{...%}") is copied literally
+ * into the generated scanner
  * class. You can use this to define methods and/or declare fields of the
  * scanner class, which the lexical actions may also reference. Most likely,
  * you will only need to tweak what's already provided below.
@@ -53,8 +54,8 @@ import Parser.sym;
   private Symbol symbol(int code, Object value) {
     // Calculate symbol location
     int yylen = yylength();
-    Location left = new Location(yyline + 1, yycolumn + 1, yychar);
-    Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
+    Location left = new Location(yyline + 1, yycolumn + 1);
+    Location right = new Location(yyline + 1, yycolumn + yylen);
     // Calculate symbol name
     int max_code = sym.terminalNames.length;
     String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
@@ -67,13 +68,13 @@ import Parser.sym;
    *
    * @param code     identifier of the lexical token (i.e., sym.<TOKEN>)
    * @effects        constructs new ComplexSymbol via this.symbolFactory
-   * @return         a fresh symbol storing the above-desribed information
+   * @return         a fresh symbol storing the above-described information
    */
   private Symbol symbol(int code) {
     // Calculate symbol location
     int yylen = yylength();
-    Location left = new Location(yyline + 1, yycolumn + 1, yychar);
-    Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
+    Location left = new Location(yyline + 1, yycolumn + 1);
+    Location right = new Location(yyline + 1, yycolumn + yylen);
     // Calculate symbol name
     int max_code = sym.terminalNames.length;
     String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
