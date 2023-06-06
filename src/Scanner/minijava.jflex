@@ -95,9 +95,11 @@ import Parser.sym;
      ComplexSymbol cs = (ComplexSymbol)s; 
      if (cs.sym == sym.IDENTIFIER) {
        return "ID(" + (String)cs.value + ")";
-     } else if (cs.sym == sym.error) {
+     }else if(cs.sym == sym.INTEGER_LITERAL){
+        return "INTEGER_LITERAL(" + (String)cs.value + ")";
+     }else if (cs.sym == sym.error) {
        return "<UNEXPECTED(" + (String)cs.value + ")>";
-     } else {
+     }else{
        return cs.getName();
      }
    }
@@ -108,31 +110,83 @@ letter = [a-zA-Z]
 digit = [0-9]
 eol = [\r\n]
 white = {eol}|[ \t]
+inline = \/\/
+multistart = \/\*
 
 %%
 
 /* Token definitions */
 
 /* reserved words (first so that they take precedence over identifiers) */
-"display" { return symbol(sym.DISPLAY); }
 
 /* operators */
 "+" { return symbol(sym.PLUS); }
+"-" { return symbol(sym.MINUS); }
 "=" { return symbol(sym.BECOMES); }
+"*" { return symbol(sym.TIMES); }
+"!" { return symbol(sym.NOT); }
+"&&" { return symbol(sym.AND); }
+"." { return symbol(sym.PERIOD); }
+"<" { return symbol(sym.LESS_THAN); }
+
 
 /* delimiters */
 "(" { return symbol(sym.LPAREN); }
 ")" { return symbol(sym.RPAREN); }
+"[" { return symbol(sym.LBRACKET); }
+"]" { return symbol(sym.RBRACKET); }
+"{" { return symbol(sym.LBRACE); }
+"}" { return symbol(sym.RBRACE); }
 ";" { return symbol(sym.SEMICOLON); }
+"," { return symbol(sym.COMMA); }
+
+/* types */
+"int" { return symbol(sym.INT); }
+"boolean" { return symbol(sym.BOOLEAN); }
+
+/* keywords */
+"true" { return symbol(sym.TRUE); }
+"false" { return symbol(sym.FALSE); }
+"class" { return symbol(sym.CLASS); }
+"public" { return symbol(sym.PUBLIC); }
+"static" { return symbol(sym.STATIC); }
+"void" { return symbol(sym.VOID); }
+"main" { return symbol(sym.MAIN); }
+"new" { return symbol(sym.NEW); }
+"if" { return symbol(sym.IF); }
+"else" { return symbol(sym.ELSE); }
+"while" { return symbol(sym.WHILE); }
+"System.out.println" { return symbol(sym.SOUT); }
+"this" { return symbol(sym.THIS); }
+"return" { return symbol(sym.RETURN); }
+"extends" { return symbol(sym.EXTENDS); }
+"length" { return symbol(sym.LENGTH); }
+"String" { return symbol(sym.STRING); }
 
 /* identifiers */
-{letter} ({letter}|{digit}|_)* {
+{letter}({letter}|{digit}|_)* {
   return symbol(sym.IDENTIFIER, yytext());
 }
 
+/* int literal */
+([1-9]{digit}*|0) {
+    return symbol(sym.INTEGER_LITERAL, yytext());
+}
+
+/* letters */
+{letter} {
+    return symbol(sym.LETTER, yytext());
+}
 
 /* whitespace */
 {white}+ { /* ignore whitespace */ }
+
+/* Comments */
+{inline}[^{eol}]*{eol} {}
+
+{multistart}([^*]|([*]+[^/*]))*[*]+\/ {}
+
+
 
 /* lexical errors (last so other matches take precedence) */
 . {

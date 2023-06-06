@@ -95,7 +95,9 @@
     <java classname="MiniJava" classpath="build/classes;lib/java-cup-11b.jar"
           fork="true">
       <arg value="-S"/>
-      <arg value="SamplePrograms/Example.java"/>
+<!--      <arg value="SamplePrograms/Example.java"/>-->
+      <arg value="SamplePrograms/SampleMiniJavaPrograms/Factorial.java"/>
+
       <assertions> <enable/> </assertions>
     </java>
   </target>

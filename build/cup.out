@@ -1,282 +1,2717 @@
 ===== Terminals =====
-[0]EOF [1]error [2]DISPLAY [3]PLUS [4]BECOMES 
-[5]LPAREN [6]RPAREN [7]SEMICOLON [8]IDENTIFIER 
+[0]EOF [1]error [2]PLUS [3]MINUS [4]TIMES 
+[5]AND [6]BECOMES [7]NOT [8]PERIOD [9]LESS_THAN 
+[10]LPAREN [11]RPAREN [12]SEMICOLON [13]COMMA [14]LBRACKET 
+[15]RBRACKET [16]LBRACE [17]RBRACE [18]IDENTIFIER [19]INT 
+[20]BOOLEAN [21]INTEGER_LITERAL [22]TRUE [23]FALSE [24]CLASS 
+[25]PUBLIC [26]STATIC [27]VOID [28]MAIN [29]NEW 
+[30]IF [31]ELSE [32]WHILE [33]SOUT [34]THIS 
+[35]RETURN [36]EXTENDS [37]LENGTH [38]STRING 
 
 ===== Non terminals =====
-[0]Program [1]Statement [2]AssignStatement [3]DisplayStatement [4]Expression 
-[5]Identifier 
+[0]Program [1]MainClass [2]ClassDecl [3]ClassDeclList [4]MethodDecl 
+[5]MethodDeclList [6]VarDecl [7]VarDeclList [8]Formal [9]FormalList 
+[10]Type [11]Statement [12]StatementList [13]Exp [14]ExpList 
+[15]Identifier 
 
 ===== Productions =====
-[0] Program ::= Statement 
+[0] Program ::= MainClass ClassDeclList 
 [1] $START ::= Program EOF 
-[2] Program ::= Program Statement 
-[3] Statement ::= AssignStatement 
-[4] Statement ::= DisplayStatement 
-[5] AssignStatement ::= Identifier BECOMES Expression SEMICOLON 
-[6] Identifier ::= IDENTIFIER 
-[7] DisplayStatement ::= DISPLAY Expression SEMICOLON 
-[8] Expression ::= IDENTIFIER 
-[9] Expression ::= Expression PLUS Expression 
-[10] Expression ::= LPAREN Expression RPAREN 
+[2] MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE 
+[3] ClassDecl ::= CLASS Identifier EXTENDS Identifier LBRACE VarDeclList MethodDeclList RBRACE 
+[4] ClassDecl ::= CLASS Identifier LBRACE VarDeclList MethodDeclList RBRACE 
+[5] ClassDeclList ::= ClassDeclList ClassDecl 
+[6] ClassDeclList ::= 
+[7] MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE 
+[8] MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE 
+[9] MethodDeclList ::= MethodDeclList MethodDecl 
+[10] MethodDeclList ::= 
+[11] VarDecl ::= Type Identifier SEMICOLON 
+[12] VarDeclList ::= VarDeclList VarDecl 
+[13] VarDeclList ::= 
+[14] Formal ::= Type Identifier 
+[15] FormalList ::= Formal 
+[16] FormalList ::= FormalList COMMA Formal 
+[17] Type ::= INT LBRACKET RBRACKET 
+[18] Type ::= BOOLEAN 
+[19] Type ::= INT 
+[20] Type ::= IDENTIFIER 
+[21] Statement ::= LBRACE StatementList RBRACE 
+[22] Statement ::= IF LPAREN Exp RPAREN Statement ELSE Statement 
+[23] Statement ::= SOUT LPAREN Exp RPAREN SEMICOLON 
+[24] Statement ::= WHILE LPAREN Exp RPAREN Statement 
+[25] Statement ::= Identifier BECOMES Exp SEMICOLON 
+[26] Statement ::= Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON 
+[27] StatementList ::= Statement StatementList 
+[28] StatementList ::= 
+[29] Exp ::= Exp AND Exp 
+[30] Exp ::= Exp LESS_THAN Exp 
+[31] Exp ::= Exp PLUS Exp 
+[32] Exp ::= Exp MINUS Exp 
+[33] Exp ::= Exp TIMES Exp 
+[34] Exp ::= Exp LBRACKET Exp RBRACKET 
+[35] Exp ::= Exp PERIOD LENGTH 
+[36] Exp ::= Exp PERIOD Identifier LPAREN ExpList RPAREN 
+[37] Exp ::= Exp PERIOD Identifier LPAREN RPAREN 
+[38] Exp ::= INTEGER_LITERAL 
+[39] Exp ::= TRUE 
+[40] Exp ::= FALSE 
+[41] Exp ::= IDENTIFIER 
+[42] Exp ::= THIS 
+[43] Exp ::= NEW INT LBRACKET Exp RBRACKET 
+[44] Exp ::= NEW Identifier LPAREN RPAREN 
+[45] Exp ::= NOT Exp 
+[46] Exp ::= LPAREN Exp RPAREN 
+[47] ExpList ::= Exp 
+[48] ExpList ::= ExpList COMMA Exp 
+[49] Identifier ::= IDENTIFIER 
 
 ===== Viable Prefix Recognizer =====
 START lalr_state [0]: {
-  [AssignStatement ::= (*) Identifier BECOMES Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Program ::= (*) Program Statement , {EOF DISPLAY IDENTIFIER }]
-  [DisplayStatement ::= (*) DISPLAY Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Statement ::= (*) DisplayStatement , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= (*) CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
   [$START ::= (*) Program EOF , {EOF }]
-  [Identifier ::= (*) IDENTIFIER , {BECOMES }]
-  [Statement ::= (*) AssignStatement , {EOF DISPLAY IDENTIFIER }]
-  [Program ::= (*) Statement , {EOF DISPLAY IDENTIFIER }]
+  [Program ::= (*) MainClass ClassDeclList , {EOF }]
 }
-transition on Identifier to state [7]
-transition on IDENTIFIER to state [6]
-transition on DISPLAY to state [5]
-transition on DisplayStatement to state [4]
-transition on Statement to state [3]
-transition on AssignStatement to state [2]
+transition on CLASS to state [3]
+transition on MainClass to state [2]
 transition on Program to state [1]
 
 -------------------
 lalr_state [1]: {
-  [AssignStatement ::= (*) Identifier BECOMES Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Program ::= Program (*) Statement , {EOF DISPLAY IDENTIFIER }]
-  [DisplayStatement ::= (*) DISPLAY Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Statement ::= (*) DisplayStatement , {EOF DISPLAY IDENTIFIER }]
   [$START ::= Program (*) EOF , {EOF }]
-  [Identifier ::= (*) IDENTIFIER , {BECOMES }]
-  [Statement ::= (*) AssignStatement , {EOF DISPLAY IDENTIFIER }]
 }
-transition on Identifier to state [7]
-transition on EOF to state [20]
-transition on IDENTIFIER to state [6]
-transition on DISPLAY to state [5]
-transition on Statement to state [19]
-transition on DisplayStatement to state [4]
-transition on AssignStatement to state [2]
+transition on EOF to state [145]
 
 -------------------
 lalr_state [2]: {
-  [Statement ::= AssignStatement (*) , {EOF DISPLAY IDENTIFIER }]
+  [ClassDeclList ::= (*) ClassDeclList ClassDecl , {EOF CLASS }]
+  [ClassDeclList ::= (*) , {EOF CLASS }]
+  [Program ::= MainClass (*) ClassDeclList , {EOF }]
 }
+transition on ClassDeclList to state [94]
 
 -------------------
 lalr_state [3]: {
-  [Program ::= Statement (*) , {EOF DISPLAY IDENTIFIER }]
+  [Identifier ::= (*) IDENTIFIER , {LBRACE }]
+  [MainClass ::= CLASS (*) Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
+transition on Identifier to state [5]
+transition on IDENTIFIER to state [4]
 
 -------------------
 lalr_state [4]: {
-  [Statement ::= DisplayStatement (*) , {EOF DISPLAY IDENTIFIER }]
+  [Identifier ::= IDENTIFIER (*) , {BECOMES LPAREN RPAREN SEMICOLON COMMA LBRACKET LBRACE EXTENDS }]
 }
 
 -------------------
 lalr_state [5]: {
-  [Expression ::= (*) IDENTIFIER , {PLUS SEMICOLON }]
-  [Expression ::= (*) LPAREN Expression RPAREN , {PLUS SEMICOLON }]
-  [DisplayStatement ::= DISPLAY (*) Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Expression ::= (*) Expression PLUS Expression , {PLUS SEMICOLON }]
+  [MainClass ::= CLASS Identifier (*) LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on LPAREN to state [11]
-transition on IDENTIFIER to state [10]
-transition on Expression to state [17]
+transition on LBRACE to state [6]
 
 -------------------
 lalr_state [6]: {
-  [Identifier ::= IDENTIFIER (*) , {BECOMES }]
+  [MainClass ::= CLASS Identifier LBRACE (*) PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
+transition on PUBLIC to state [7]
 
 -------------------
 lalr_state [7]: {
-  [AssignStatement ::= Identifier (*) BECOMES Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC (*) STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on BECOMES to state [8]
+transition on STATIC to state [8]
 
 -------------------
 lalr_state [8]: {
-  [Expression ::= (*) IDENTIFIER , {PLUS SEMICOLON }]
-  [Expression ::= (*) LPAREN Expression RPAREN , {PLUS SEMICOLON }]
-  [Expression ::= (*) Expression PLUS Expression , {PLUS SEMICOLON }]
-  [AssignStatement ::= Identifier BECOMES (*) Expression SEMICOLON , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC (*) VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on LPAREN to state [11]
-transition on IDENTIFIER to state [10]
-transition on Expression to state [9]
+transition on VOID to state [9]
 
 -------------------
 lalr_state [9]: {
-  [Expression ::= Expression (*) PLUS Expression , {PLUS SEMICOLON }]
-  [AssignStatement ::= Identifier BECOMES Expression (*) SEMICOLON , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID (*) MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on PLUS to state [14]
-transition on SEMICOLON to state [16]
+transition on MAIN to state [10]
 
 -------------------
 lalr_state [10]: {
-  [Expression ::= IDENTIFIER (*) , {PLUS RPAREN SEMICOLON }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN (*) LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
+transition on LPAREN to state [11]
 
 -------------------
 lalr_state [11]: {
-  [Expression ::= (*) IDENTIFIER , {PLUS RPAREN }]
-  [Expression ::= LPAREN (*) Expression RPAREN , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= (*) LPAREN Expression RPAREN , {PLUS RPAREN }]
-  [Expression ::= (*) Expression PLUS Expression , {PLUS RPAREN }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN (*) STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on LPAREN to state [11]
-transition on IDENTIFIER to state [10]
-transition on Expression to state [12]
+transition on STRING to state [12]
 
 -------------------
 lalr_state [12]: {
-  [Expression ::= LPAREN Expression (*) RPAREN , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= Expression (*) PLUS Expression , {PLUS RPAREN }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING (*) LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on PLUS to state [14]
-transition on RPAREN to state [13]
+transition on LBRACKET to state [13]
 
 -------------------
 lalr_state [13]: {
-  [Expression ::= LPAREN Expression RPAREN (*) , {PLUS RPAREN SEMICOLON }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET (*) RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
+transition on RBRACKET to state [14]
 
 -------------------
 lalr_state [14]: {
-  [Expression ::= (*) IDENTIFIER , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= (*) LPAREN Expression RPAREN , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= Expression PLUS (*) Expression , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= (*) Expression PLUS Expression , {PLUS RPAREN SEMICOLON }]
+  [Identifier ::= (*) IDENTIFIER , {RPAREN }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET (*) Identifier RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on LPAREN to state [11]
-transition on IDENTIFIER to state [10]
-transition on Expression to state [15]
+transition on Identifier to state [15]
+transition on IDENTIFIER to state [4]
 
 -------------------
 lalr_state [15]: {
-  [Expression ::= Expression PLUS Expression (*) , {PLUS RPAREN SEMICOLON }]
-  [Expression ::= Expression (*) PLUS Expression , {PLUS RPAREN SEMICOLON }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier (*) RPAREN LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on PLUS to state [14]
+transition on RPAREN to state [16]
 
 -------------------
 lalr_state [16]: {
-  [AssignStatement ::= Identifier BECOMES Expression SEMICOLON (*) , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN (*) LBRACE Statement RBRACE RBRACE , {EOF CLASS }]
 }
+transition on LBRACE to state [17]
 
 -------------------
 lalr_state [17]: {
-  [DisplayStatement ::= DISPLAY Expression (*) SEMICOLON , {EOF DISPLAY IDENTIFIER }]
-  [Expression ::= Expression (*) PLUS Expression , {PLUS SEMICOLON }]
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {RBRACE }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {RBRACE }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {RBRACE }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {RBRACE }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {RBRACE }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {RBRACE }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE (*) Statement RBRACE RBRACE , {EOF CLASS }]
 }
-transition on PLUS to state [14]
-transition on SEMICOLON to state [18]
+transition on Identifier to state [23]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on SOUT to state [20]
+transition on Statement to state [19]
+transition on LBRACE to state [18]
 
 -------------------
 lalr_state [18]: {
-  [DisplayStatement ::= DISPLAY Expression SEMICOLON (*) , {EOF DISPLAY IDENTIFIER }]
+  [StatementList ::= (*) , {RBRACE }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
+  [StatementList ::= (*) Statement StatementList , {RBRACE }]
+  [Statement ::= LBRACE (*) StatementList RBRACE , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT }]
 }
+transition on Identifier to state [23]
+transition on StatementList to state [91]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on Statement to state [90]
+transition on SOUT to state [20]
+transition on LBRACE to state [18]
 
 -------------------
 lalr_state [19]: {
-  [Program ::= Program Statement (*) , {EOF DISPLAY IDENTIFIER }]
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement (*) RBRACE RBRACE , {EOF CLASS }]
 }
+transition on RBRACE to state [88]
 
 -------------------
 lalr_state [20]: {
+  [Statement ::= SOUT (*) LPAREN Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on LPAREN to state [84]
+
+-------------------
+lalr_state [21]: {
+  [Statement ::= WHILE (*) LPAREN Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on LPAREN to state [80]
+
+-------------------
+lalr_state [22]: {
+  [Statement ::= IF (*) LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on LPAREN to state [74]
+
+-------------------
+lalr_state [23]: {
+  [Statement ::= Identifier (*) LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= Identifier (*) BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on LBRACKET to state [25]
+transition on BECOMES to state [24]
+
+-------------------
+lalr_state [24]: {
+  [Statement ::= Identifier BECOMES (*) Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [72]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [25]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Statement ::= Identifier LBRACKET (*) Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [28]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [26]: {
+  [Identifier ::= (*) IDENTIFIER , {LPAREN }]
+  [Exp ::= NEW (*) INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= NEW (*) Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INT to state [66]
+transition on Identifier to state [65]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [27]: {
+  [Exp ::= TRUE (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [28]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Statement ::= Identifier LBRACKET Exp (*) RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on RBRACKET to state [61]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [29]: {
+  [Exp ::= FALSE (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [30]: {
+  [Exp ::= THIS (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [31]: {
+  [Exp ::= IDENTIFIER (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [32]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= NOT (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [60]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [33]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= LPAREN (*) Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [35]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [34]: {
+  [Exp ::= INTEGER_LITERAL (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [35]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= LPAREN Exp (*) RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+transition on RPAREN to state [36]
+
+-------------------
+lalr_state [36]: {
+  [Exp ::= LPAREN Exp RPAREN (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [37]: {
+  [Exp ::= Exp LESS_THAN (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [59]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [38]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp AND (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [58]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [39]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp PLUS (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [57]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [40]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp MINUS (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [56]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [41]: {
+  [Exp ::= Exp PERIOD (*) LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Identifier ::= (*) IDENTIFIER , {LPAREN }]
+  [Exp ::= Exp PERIOD (*) Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp PERIOD (*) Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on Identifier to state [48]
+transition on IDENTIFIER to state [4]
+transition on LENGTH to state [47]
+
+-------------------
+lalr_state [42]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp TIMES (*) Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [46]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [43]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp LBRACKET (*) Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [44]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [44]: {
+  [Exp ::= Exp LBRACKET Exp (*) RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on RBRACKET to state [45]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [45]: {
+  [Exp ::= Exp LBRACKET Exp RBRACKET (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [46]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp TIMES Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [47]: {
+  [Exp ::= Exp PERIOD LENGTH (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [48]: {
+  [Exp ::= Exp PERIOD Identifier (*) LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp PERIOD Identifier (*) LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LPAREN to state [49]
+
+-------------------
+lalr_state [49]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [ExpList ::= (*) ExpList COMMA Exp , {RPAREN COMMA }]
+  [Exp ::= Exp PERIOD Identifier LPAREN (*) ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp PERIOD Identifier LPAREN (*) RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [ExpList ::= (*) Exp , {RPAREN COMMA }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on RPAREN to state [52]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on ExpList to state [51]
+transition on Exp to state [50]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [50]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [ExpList ::= Exp (*) , {RPAREN COMMA }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [51]: {
+  [Exp ::= Exp PERIOD Identifier LPAREN ExpList (*) RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [ExpList ::= ExpList (*) COMMA Exp , {RPAREN COMMA }]
+}
+transition on RPAREN to state [54]
+transition on COMMA to state [53]
+
+-------------------
+lalr_state [52]: {
+  [Exp ::= Exp PERIOD Identifier LPAREN RPAREN (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [53]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [ExpList ::= ExpList COMMA (*) Exp , {RPAREN COMMA }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [55]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [54]: {
+  [Exp ::= Exp PERIOD Identifier LPAREN ExpList RPAREN (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [55]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [ExpList ::= ExpList COMMA Exp (*) , {RPAREN COMMA }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN COMMA LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [56]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp MINUS Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [57]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp PLUS Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [58]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp AND Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [59]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp LESS_THAN Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [60]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= NOT Exp (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [61]: {
+  [Statement ::= Identifier LBRACKET Exp RBRACKET (*) BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on BECOMES to state [62]
+
+-------------------
+lalr_state [62]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Statement ::= Identifier LBRACKET Exp RBRACKET BECOMES (*) Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [63]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [63]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Statement ::= Identifier LBRACKET Exp RBRACKET BECOMES Exp (*) SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+transition on SEMICOLON to state [64]
+
+-------------------
+lalr_state [64]: {
+  [Statement ::= Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [65]: {
+  [Exp ::= NEW Identifier (*) LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LPAREN to state [70]
+
+-------------------
+lalr_state [66]: {
+  [Exp ::= NEW INT (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [67]
+
+-------------------
+lalr_state [67]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= NEW INT LBRACKET (*) Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [68]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [68]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+  [Exp ::= NEW INT LBRACKET Exp (*) RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN LBRACKET RBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on RBRACKET to state [69]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [69]: {
+  [Exp ::= NEW INT LBRACKET Exp RBRACKET (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [70]: {
+  [Exp ::= NEW Identifier LPAREN (*) RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+transition on RPAREN to state [71]
+
+-------------------
+lalr_state [71]: {
+  [Exp ::= NEW Identifier LPAREN RPAREN (*) , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN SEMICOLON COMMA LBRACKET RBRACKET }]
+}
+
+-------------------
+lalr_state [72]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Statement ::= Identifier BECOMES Exp (*) SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on SEMICOLON to state [73]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [73]: {
+  [Statement ::= Identifier BECOMES Exp SEMICOLON (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [74]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= IF LPAREN (*) Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [75]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [75]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= IF LPAREN Exp (*) RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on RPAREN to state [76]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [76]: {
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {ELSE }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {ELSE }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {ELSE }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {ELSE }]
+  [Statement ::= IF LPAREN Exp RPAREN (*) Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {ELSE }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {ELSE }]
+}
+transition on Identifier to state [23]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on SOUT to state [20]
+transition on Statement to state [77]
+transition on LBRACE to state [18]
+
+-------------------
+lalr_state [77]: {
+  [Statement ::= IF LPAREN Exp RPAREN Statement (*) ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on ELSE to state [78]
+
+-------------------
+lalr_state [78]: {
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= IF LPAREN Exp RPAREN Statement ELSE (*) Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on Identifier to state [23]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on Statement to state [79]
+transition on SOUT to state [20]
+transition on LBRACE to state [18]
+
+-------------------
+lalr_state [79]: {
+  [Statement ::= IF LPAREN Exp RPAREN Statement ELSE Statement (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [80]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= WHILE LPAREN (*) Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [81]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [81]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= WHILE LPAREN Exp (*) RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+transition on RPAREN to state [82]
+
+-------------------
+lalr_state [82]: {
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= WHILE LPAREN Exp RPAREN (*) Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on Identifier to state [23]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on SOUT to state [20]
+transition on Statement to state [83]
+transition on LBRACE to state [18]
+
+-------------------
+lalr_state [83]: {
+  [Statement ::= WHILE LPAREN Exp RPAREN Statement (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [84]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= SOUT LPAREN (*) Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [85]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [85]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+  [Statement ::= SOUT LPAREN Exp (*) RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN RPAREN LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+transition on RPAREN to state [86]
+
+-------------------
+lalr_state [86]: {
+  [Statement ::= SOUT LPAREN Exp RPAREN (*) SEMICOLON , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on SEMICOLON to state [87]
+
+-------------------
+lalr_state [87]: {
+  [Statement ::= SOUT LPAREN Exp RPAREN SEMICOLON (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [88]: {
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE (*) RBRACE , {EOF CLASS }]
+}
+transition on RBRACE to state [89]
+
+-------------------
+lalr_state [89]: {
+  [MainClass ::= CLASS Identifier LBRACE PUBLIC STATIC VOID MAIN LPAREN STRING LBRACKET RBRACKET Identifier RPAREN LBRACE Statement RBRACE RBRACE (*) , {EOF CLASS }]
+}
+
+-------------------
+lalr_state [90]: {
+  [StatementList ::= (*) , {RBRACE RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [StatementList ::= Statement (*) StatementList , {RBRACE RETURN }]
+  [StatementList ::= (*) Statement StatementList , {RBRACE RETURN }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE RBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+}
+transition on Identifier to state [23]
+transition on StatementList to state [93]
+transition on IF to state [22]
+transition on WHILE to state [21]
+transition on IDENTIFIER to state [4]
+transition on Statement to state [90]
+transition on SOUT to state [20]
+transition on LBRACE to state [18]
+
+-------------------
+lalr_state [91]: {
+  [Statement ::= LBRACE StatementList (*) RBRACE , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+transition on RBRACE to state [92]
+
+-------------------
+lalr_state [92]: {
+  [Statement ::= LBRACE StatementList RBRACE (*) , {LBRACE RBRACE IDENTIFIER IF ELSE WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [93]: {
+  [StatementList ::= Statement StatementList (*) , {RBRACE RETURN }]
+}
+
+-------------------
+lalr_state [94]: {
+  [ClassDeclList ::= ClassDeclList (*) ClassDecl , {EOF CLASS }]
+  [ClassDecl ::= (*) CLASS Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+  [Program ::= MainClass ClassDeclList (*) , {EOF }]
+  [ClassDecl ::= (*) CLASS Identifier EXTENDS Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+}
+transition on CLASS to state [96]
+transition on ClassDecl to state [95]
+
+-------------------
+lalr_state [95]: {
+  [ClassDeclList ::= ClassDeclList ClassDecl (*) , {EOF CLASS }]
+}
+
+-------------------
+lalr_state [96]: {
+  [Identifier ::= (*) IDENTIFIER , {LBRACE EXTENDS }]
+  [ClassDecl ::= CLASS (*) Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+  [ClassDecl ::= CLASS (*) Identifier EXTENDS Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+}
+transition on Identifier to state [97]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [97]: {
+  [ClassDecl ::= CLASS Identifier (*) LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+  [ClassDecl ::= CLASS Identifier (*) EXTENDS Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+}
+transition on EXTENDS to state [99]
+transition on LBRACE to state [98]
+
+-------------------
+lalr_state [98]: {
+  [VarDeclList ::= (*) , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [ClassDecl ::= CLASS Identifier LBRACE (*) VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+  [VarDeclList ::= (*) VarDeclList VarDecl , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+}
+transition on VarDeclList to state [142]
+
+-------------------
+lalr_state [99]: {
+  [Identifier ::= (*) IDENTIFIER , {LBRACE }]
+  [ClassDecl ::= CLASS Identifier EXTENDS (*) Identifier LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+}
+transition on Identifier to state [100]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [100]: {
+  [ClassDecl ::= CLASS Identifier EXTENDS Identifier (*) LBRACE VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+}
+transition on LBRACE to state [101]
+
+-------------------
+lalr_state [101]: {
+  [VarDeclList ::= (*) , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [ClassDecl ::= CLASS Identifier EXTENDS Identifier LBRACE (*) VarDeclList MethodDeclList RBRACE , {EOF CLASS }]
+  [VarDeclList ::= (*) VarDeclList VarDecl , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+}
+transition on VarDeclList to state [102]
+
+-------------------
+lalr_state [102]: {
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [VarDecl ::= (*) Type Identifier SEMICOLON , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [MethodDeclList ::= (*) , {RBRACE PUBLIC }]
+  [ClassDecl ::= CLASS Identifier EXTENDS Identifier LBRACE VarDeclList (*) MethodDeclList RBRACE , {EOF CLASS }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [VarDeclList ::= VarDeclList (*) VarDecl , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [MethodDeclList ::= (*) MethodDeclList MethodDecl , {RBRACE PUBLIC }]
+}
+transition on INT to state [108]
+transition on BOOLEAN to state [107]
+transition on IDENTIFIER to state [106]
+transition on MethodDeclList to state [105]
+transition on VarDecl to state [104]
+transition on Type to state [103]
+
+-------------------
+lalr_state [103]: {
+  [Identifier ::= (*) IDENTIFIER , {SEMICOLON }]
+  [VarDecl ::= Type (*) Identifier SEMICOLON , {LBRACE RBRACE IDENTIFIER INT BOOLEAN PUBLIC IF WHILE SOUT RETURN }]
+}
+transition on Identifier to state [140]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [104]: {
+  [VarDeclList ::= VarDeclList VarDecl (*) , {LBRACE RBRACE IDENTIFIER INT BOOLEAN PUBLIC IF WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [105]: {
+  [MethodDecl ::= (*) PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [ClassDecl ::= CLASS Identifier EXTENDS Identifier LBRACE VarDeclList MethodDeclList (*) RBRACE , {EOF CLASS }]
+  [MethodDecl ::= (*) PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [MethodDeclList ::= MethodDeclList (*) MethodDecl , {RBRACE PUBLIC }]
+}
+transition on PUBLIC to state [113]
+transition on MethodDecl to state [112]
+transition on RBRACE to state [111]
+
+-------------------
+lalr_state [106]: {
+  [Type ::= IDENTIFIER (*) , {IDENTIFIER }]
+}
+
+-------------------
+lalr_state [107]: {
+  [Type ::= BOOLEAN (*) , {IDENTIFIER }]
+}
+
+-------------------
+lalr_state [108]: {
+  [Type ::= INT (*) LBRACKET RBRACKET , {IDENTIFIER }]
+  [Type ::= INT (*) , {IDENTIFIER }]
+}
+transition on LBRACKET to state [109]
+
+-------------------
+lalr_state [109]: {
+  [Type ::= INT LBRACKET (*) RBRACKET , {IDENTIFIER }]
+}
+transition on RBRACKET to state [110]
+
+-------------------
+lalr_state [110]: {
+  [Type ::= INT LBRACKET RBRACKET (*) , {IDENTIFIER }]
+}
+
+-------------------
+lalr_state [111]: {
+  [ClassDecl ::= CLASS Identifier EXTENDS Identifier LBRACE VarDeclList MethodDeclList RBRACE (*) , {EOF CLASS }]
+}
+
+-------------------
+lalr_state [112]: {
+  [MethodDeclList ::= MethodDeclList MethodDecl (*) , {RBRACE PUBLIC }]
+}
+
+-------------------
+lalr_state [113]: {
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [MethodDecl ::= PUBLIC (*) Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [MethodDecl ::= PUBLIC (*) Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on INT to state [108]
+transition on BOOLEAN to state [107]
+transition on IDENTIFIER to state [106]
+transition on Type to state [114]
+
+-------------------
+lalr_state [114]: {
+  [Identifier ::= (*) IDENTIFIER , {LPAREN }]
+  [MethodDecl ::= PUBLIC Type (*) Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [MethodDecl ::= PUBLIC Type (*) Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on Identifier to state [115]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [115]: {
+  [MethodDecl ::= PUBLIC Type Identifier (*) LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [MethodDecl ::= PUBLIC Type Identifier (*) LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on LPAREN to state [116]
+
+-------------------
+lalr_state [116]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN (*) RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [Formal ::= (*) Type Identifier , {RPAREN COMMA }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN (*) FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [FormalList ::= (*) FormalList COMMA Formal , {RPAREN COMMA }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [FormalList ::= (*) Formal , {RPAREN COMMA }]
+}
+transition on INT to state [108]
+transition on BOOLEAN to state [107]
+transition on IDENTIFIER to state [106]
+transition on RPAREN to state [120]
+transition on Type to state [119]
+transition on Formal to state [118]
+transition on FormalList to state [117]
+
+-------------------
+lalr_state [117]: {
+  [FormalList ::= FormalList (*) COMMA Formal , {RPAREN COMMA }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList (*) RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on RPAREN to state [131]
+transition on COMMA to state [130]
+
+-------------------
+lalr_state [118]: {
+  [FormalList ::= Formal (*) , {RPAREN COMMA }]
+}
+
+-------------------
+lalr_state [119]: {
+  [Identifier ::= (*) IDENTIFIER , {RPAREN COMMA }]
+  [Formal ::= Type (*) Identifier , {RPAREN COMMA }]
+}
+transition on Identifier to state [129]
+transition on IDENTIFIER to state [4]
+
+-------------------
+lalr_state [120]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN (*) LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on LBRACE to state [121]
+
+-------------------
+lalr_state [121]: {
+  [VarDeclList ::= (*) , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE (*) VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [VarDeclList ::= (*) VarDeclList VarDecl , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+}
+transition on VarDeclList to state [122]
+
+-------------------
+lalr_state [122]: {
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [VarDecl ::= (*) Type Identifier SEMICOLON , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [StatementList ::= (*) , {RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [StatementList ::= (*) Statement StatementList , {RETURN }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [VarDeclList ::= VarDeclList (*) VarDecl , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList (*) StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+}
+transition on IDENTIFIER to state [124]
+transition on Statement to state [90]
+transition on IF to state [22]
+transition on Identifier to state [23]
+transition on VarDecl to state [104]
+transition on BOOLEAN to state [107]
+transition on SOUT to state [20]
+transition on StatementList to state [123]
+transition on LBRACE to state [18]
+transition on WHILE to state [21]
+transition on INT to state [108]
+transition on Type to state [103]
+
+-------------------
+lalr_state [123]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList (*) RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on RETURN to state [125]
+
+-------------------
+lalr_state [124]: {
+  [Identifier ::= IDENTIFIER (*) , {BECOMES LBRACKET }]
+  [Type ::= IDENTIFIER (*) , {IDENTIFIER }]
+}
+
+-------------------
+lalr_state [125]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN (*) Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [126]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [126]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp (*) SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on LESS_THAN to state [37]
+transition on SEMICOLON to state [127]
+
+-------------------
+lalr_state [127]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON (*) RBRACE , {RBRACE PUBLIC }]
+}
+transition on RBRACE to state [128]
+
+-------------------
+lalr_state [128]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE (*) , {RBRACE PUBLIC }]
+}
+
+-------------------
+lalr_state [129]: {
+  [Formal ::= Type Identifier (*) , {RPAREN COMMA }]
+}
+
+-------------------
+lalr_state [130]: {
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [Formal ::= (*) Type Identifier , {RPAREN COMMA }]
+  [FormalList ::= FormalList COMMA (*) Formal , {RPAREN COMMA }]
+}
+transition on INT to state [108]
+transition on BOOLEAN to state [107]
+transition on IDENTIFIER to state [106]
+transition on Type to state [119]
+transition on Formal to state [139]
+
+-------------------
+lalr_state [131]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN (*) LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on LBRACE to state [132]
+
+-------------------
+lalr_state [132]: {
+  [VarDeclList ::= (*) , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [VarDeclList ::= (*) VarDeclList VarDecl , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE (*) VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on VarDeclList to state [133]
+
+-------------------
+lalr_state [133]: {
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [VarDecl ::= (*) Type Identifier SEMICOLON , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList (*) StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [StatementList ::= (*) , {RETURN }]
+  [Statement ::= (*) Identifier BECOMES Exp SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) IF LPAREN Exp RPAREN Statement ELSE Statement , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [StatementList ::= (*) Statement StatementList , {RETURN }]
+  [Statement ::= (*) WHILE LPAREN Exp RPAREN Statement , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) LBRACE StatementList RBRACE , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [VarDeclList ::= VarDeclList (*) VarDecl , {LBRACE IDENTIFIER INT BOOLEAN IF WHILE SOUT RETURN }]
+  [Identifier ::= (*) IDENTIFIER , {BECOMES LBRACKET }]
+  [Statement ::= (*) Identifier LBRACKET Exp RBRACKET BECOMES Exp SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+  [Statement ::= (*) SOUT LPAREN Exp RPAREN SEMICOLON , {LBRACE IDENTIFIER IF WHILE SOUT RETURN }]
+}
+transition on IDENTIFIER to state [124]
+transition on Statement to state [90]
+transition on IF to state [22]
+transition on Identifier to state [23]
+transition on VarDecl to state [104]
+transition on BOOLEAN to state [107]
+transition on SOUT to state [20]
+transition on StatementList to state [134]
+transition on WHILE to state [21]
+transition on INT to state [108]
+transition on LBRACE to state [18]
+transition on Type to state [103]
+
+-------------------
+lalr_state [134]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList (*) RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+}
+transition on RETURN to state [135]
+
+-------------------
+lalr_state [135]: {
+  [Exp ::= (*) Exp LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) FALSE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NOT Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) INTEGER_LITERAL , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW INT LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) IDENTIFIER , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) LPAREN Exp RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN (*) Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Exp ::= (*) Exp AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) TRUE , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) NEW Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) Exp PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= (*) THIS , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on INTEGER_LITERAL to state [34]
+transition on LPAREN to state [33]
+transition on NOT to state [32]
+transition on IDENTIFIER to state [31]
+transition on THIS to state [30]
+transition on FALSE to state [29]
+transition on Exp to state [136]
+transition on TRUE to state [27]
+transition on NEW to state [26]
+
+-------------------
+lalr_state [136]: {
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp (*) SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [Exp ::= Exp (*) LBRACKET Exp RBRACKET , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PLUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD Identifier LPAREN ExpList RPAREN , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) TIMES Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) LESS_THAN Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) PERIOD LENGTH , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) MINUS Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+  [Exp ::= Exp (*) AND Exp , {PLUS MINUS TIMES AND PERIOD LESS_THAN SEMICOLON LBRACKET }]
+}
+transition on LBRACKET to state [43]
+transition on TIMES to state [42]
+transition on PERIOD to state [41]
+transition on MINUS to state [40]
+transition on PLUS to state [39]
+transition on AND to state [38]
+transition on SEMICOLON to state [137]
+transition on LESS_THAN to state [37]
+
+-------------------
+lalr_state [137]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON (*) RBRACE , {RBRACE PUBLIC }]
+}
+transition on RBRACE to state [138]
+
+-------------------
+lalr_state [138]: {
+  [MethodDecl ::= PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE (*) , {RBRACE PUBLIC }]
+}
+
+-------------------
+lalr_state [139]: {
+  [FormalList ::= FormalList COMMA Formal (*) , {RPAREN COMMA }]
+}
+
+-------------------
+lalr_state [140]: {
+  [VarDecl ::= Type Identifier (*) SEMICOLON , {LBRACE RBRACE IDENTIFIER INT BOOLEAN PUBLIC IF WHILE SOUT RETURN }]
+}
+transition on SEMICOLON to state [141]
+
+-------------------
+lalr_state [141]: {
+  [VarDecl ::= Type Identifier SEMICOLON (*) , {LBRACE RBRACE IDENTIFIER INT BOOLEAN PUBLIC IF WHILE SOUT RETURN }]
+}
+
+-------------------
+lalr_state [142]: {
+  [Type ::= (*) IDENTIFIER , {IDENTIFIER }]
+  [Type ::= (*) INT LBRACKET RBRACKET , {IDENTIFIER }]
+  [VarDecl ::= (*) Type Identifier SEMICOLON , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [Type ::= (*) INT , {IDENTIFIER }]
+  [ClassDecl ::= CLASS Identifier LBRACE VarDeclList (*) MethodDeclList RBRACE , {EOF CLASS }]
+  [MethodDeclList ::= (*) , {RBRACE PUBLIC }]
+  [Type ::= (*) BOOLEAN , {IDENTIFIER }]
+  [VarDeclList ::= VarDeclList (*) VarDecl , {RBRACE IDENTIFIER INT BOOLEAN PUBLIC }]
+  [MethodDeclList ::= (*) MethodDeclList MethodDecl , {RBRACE PUBLIC }]
+}
+transition on INT to state [108]
+transition on BOOLEAN to state [107]
+transition on IDENTIFIER to state [106]
+transition on MethodDeclList to state [143]
+transition on VarDecl to state [104]
+transition on Type to state [103]
+
+-------------------
+lalr_state [143]: {
+  [MethodDecl ::= (*) PUBLIC Type Identifier LPAREN RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [ClassDecl ::= CLASS Identifier LBRACE VarDeclList MethodDeclList (*) RBRACE , {EOF CLASS }]
+  [MethodDecl ::= (*) PUBLIC Type Identifier LPAREN FormalList RPAREN LBRACE VarDeclList StatementList RETURN Exp SEMICOLON RBRACE , {RBRACE PUBLIC }]
+  [MethodDeclList ::= MethodDeclList (*) MethodDecl , {RBRACE PUBLIC }]
+}
+transition on PUBLIC to state [113]
+transition on MethodDecl to state [112]
+transition on RBRACE to state [144]
+
+-------------------
+lalr_state [144]: {
+  [ClassDecl ::= CLASS Identifier LBRACE VarDeclList MethodDeclList RBRACE (*) , {EOF CLASS }]
+}
+
+-------------------
+lalr_state [145]: {
   [$START ::= Program EOF (*) , {EOF }]
 }
 
 -------------------
 -------- ACTION_TABLE --------
 From state #0
- [term 2:SHIFT(to state 5)] [term 8:SHIFT(to state 6)]
+ [term 24:SHIFT(to state 3)]
 From state #1
- [term 0:SHIFT(to state 20)] [term 2:SHIFT(to state 5)]
- [term 8:SHIFT(to state 6)]
+ [term 0:SHIFT(to state 145)]
 From state #2
- [term 0:REDUCE(with prod 3)] [term 2:REDUCE(with prod 3)]
- [term 8:REDUCE(with prod 3)]
+ [term 0:REDUCE(with prod 6)] [term 24:REDUCE(with prod 6)]
 From state #3
- [term 0:REDUCE(with prod 0)] [term 2:REDUCE(with prod 0)]
- [term 8:REDUCE(with prod 0)]
+ [term 18:SHIFT(to state 4)]
 From state #4
- [term 0:REDUCE(with prod 4)] [term 2:REDUCE(with prod 4)]
- [term 8:REDUCE(with prod 4)]
+ [term 6:REDUCE(with prod 49)] [term 10:REDUCE(with prod 49)]
+ [term 11:REDUCE(with prod 49)] [term 12:REDUCE(with prod 49)]
+ [term 13:REDUCE(with prod 49)] [term 14:REDUCE(with prod 49)]
+ [term 16:REDUCE(with prod 49)] [term 36:REDUCE(with prod 49)]
 From state #5
- [term 5:SHIFT(to state 11)] [term 8:SHIFT(to state 10)]
+ [term 16:SHIFT(to state 6)]
 From state #6
- [term 4:REDUCE(with prod 6)]
+ [term 25:SHIFT(to state 7)]
 From state #7
- [term 4:SHIFT(to state 8)]
+ [term 26:SHIFT(to state 8)]
 From state #8
- [term 5:SHIFT(to state 11)] [term 8:SHIFT(to state 10)]
+ [term 27:SHIFT(to state 9)]
 From state #9
- [term 3:SHIFT(to state 14)] [term 7:SHIFT(to state 16)]
+ [term 28:SHIFT(to state 10)]
 From state #10
- [term 3:REDUCE(with prod 8)] [term 6:REDUCE(with prod 8)]
- [term 7:REDUCE(with prod 8)]
+ [term 10:SHIFT(to state 11)]
 From state #11
- [term 5:SHIFT(to state 11)] [term 8:SHIFT(to state 10)]
+ [term 38:SHIFT(to state 12)]
 From state #12
- [term 3:SHIFT(to state 14)] [term 6:SHIFT(to state 13)]
+ [term 14:SHIFT(to state 13)]
 From state #13
- [term 3:REDUCE(with prod 10)] [term 6:REDUCE(with prod 10)]
- [term 7:REDUCE(with prod 10)]
+ [term 15:SHIFT(to state 14)]
 From state #14
- [term 5:SHIFT(to state 11)] [term 8:SHIFT(to state 10)]
+ [term 18:SHIFT(to state 4)]
 From state #15
- [term 3:REDUCE(with prod 9)] [term 6:REDUCE(with prod 9)]
- [term 7:REDUCE(with prod 9)]
+ [term 11:SHIFT(to state 16)]
 From state #16
- [term 0:REDUCE(with prod 5)] [term 2:REDUCE(with prod 5)]
- [term 8:REDUCE(with prod 5)]
+ [term 16:SHIFT(to state 17)]
 From state #17
- [term 3:SHIFT(to state 14)] [term 7:SHIFT(to state 18)]
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 4)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)]
 From state #18
- [term 0:REDUCE(with prod 7)] [term 2:REDUCE(with prod 7)]
- [term 8:REDUCE(with prod 7)]
+ [term 16:SHIFT(to state 18)] [term 17:REDUCE(with prod 28)]
+ [term 18:SHIFT(to state 4)] [term 30:SHIFT(to state 22)]
+ [term 32:SHIFT(to state 21)] [term 33:SHIFT(to state 20)]
 From state #19
- [term 0:REDUCE(with prod 2)] [term 2:REDUCE(with prod 2)]
- [term 8:REDUCE(with prod 2)]
+ [term 17:SHIFT(to state 88)]
 From state #20
+ [term 10:SHIFT(to state 84)]
+From state #21
+ [term 10:SHIFT(to state 80)]
+From state #22
+ [term 10:SHIFT(to state 74)]
+From state #23
+ [term 6:SHIFT(to state 24)] [term 14:SHIFT(to state 25)]
+From state #24
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #25
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #26
+ [term 18:SHIFT(to state 4)] [term 19:SHIFT(to state 66)]
+From state #27
+ [term 2:REDUCE(with prod 39)] [term 3:REDUCE(with prod 39)]
+ [term 4:REDUCE(with prod 39)] [term 5:REDUCE(with prod 39)]
+ [term 8:REDUCE(with prod 39)] [term 9:REDUCE(with prod 39)]
+ [term 11:REDUCE(with prod 39)] [term 12:REDUCE(with prod 39)]
+ [term 13:REDUCE(with prod 39)] [term 14:REDUCE(with prod 39)]
+ [term 15:REDUCE(with prod 39)]
+From state #28
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 14:SHIFT(to state 43)] [term 15:SHIFT(to state 61)]
+From state #29
+ [term 2:REDUCE(with prod 40)] [term 3:REDUCE(with prod 40)]
+ [term 4:REDUCE(with prod 40)] [term 5:REDUCE(with prod 40)]
+ [term 8:REDUCE(with prod 40)] [term 9:REDUCE(with prod 40)]
+ [term 11:REDUCE(with prod 40)] [term 12:REDUCE(with prod 40)]
+ [term 13:REDUCE(with prod 40)] [term 14:REDUCE(with prod 40)]
+ [term 15:REDUCE(with prod 40)]
+From state #30
+ [term 2:REDUCE(with prod 42)] [term 3:REDUCE(with prod 42)]
+ [term 4:REDUCE(with prod 42)] [term 5:REDUCE(with prod 42)]
+ [term 8:REDUCE(with prod 42)] [term 9:REDUCE(with prod 42)]
+ [term 11:REDUCE(with prod 42)] [term 12:REDUCE(with prod 42)]
+ [term 13:REDUCE(with prod 42)] [term 14:REDUCE(with prod 42)]
+ [term 15:REDUCE(with prod 42)]
+From state #31
+ [term 2:REDUCE(with prod 41)] [term 3:REDUCE(with prod 41)]
+ [term 4:REDUCE(with prod 41)] [term 5:REDUCE(with prod 41)]
+ [term 8:REDUCE(with prod 41)] [term 9:REDUCE(with prod 41)]
+ [term 11:REDUCE(with prod 41)] [term 12:REDUCE(with prod 41)]
+ [term 13:REDUCE(with prod 41)] [term 14:REDUCE(with prod 41)]
+ [term 15:REDUCE(with prod 41)]
+From state #32
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #33
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #34
+ [term 2:REDUCE(with prod 38)] [term 3:REDUCE(with prod 38)]
+ [term 4:REDUCE(with prod 38)] [term 5:REDUCE(with prod 38)]
+ [term 8:REDUCE(with prod 38)] [term 9:REDUCE(with prod 38)]
+ [term 11:REDUCE(with prod 38)] [term 12:REDUCE(with prod 38)]
+ [term 13:REDUCE(with prod 38)] [term 14:REDUCE(with prod 38)]
+ [term 15:REDUCE(with prod 38)]
+From state #35
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:SHIFT(to state 36)] [term 14:SHIFT(to state 43)]
+From state #36
+ [term 2:REDUCE(with prod 46)] [term 3:REDUCE(with prod 46)]
+ [term 4:REDUCE(with prod 46)] [term 5:REDUCE(with prod 46)]
+ [term 8:REDUCE(with prod 46)] [term 9:REDUCE(with prod 46)]
+ [term 11:REDUCE(with prod 46)] [term 12:REDUCE(with prod 46)]
+ [term 13:REDUCE(with prod 46)] [term 14:REDUCE(with prod 46)]
+ [term 15:REDUCE(with prod 46)]
+From state #37
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #38
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #39
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #40
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #41
+ [term 18:SHIFT(to state 4)] [term 37:SHIFT(to state 47)]
+From state #42
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #43
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #44
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 14:SHIFT(to state 43)] [term 15:SHIFT(to state 45)]
+From state #45
+ [term 2:REDUCE(with prod 34)] [term 3:REDUCE(with prod 34)]
+ [term 4:REDUCE(with prod 34)] [term 5:REDUCE(with prod 34)]
+ [term 8:REDUCE(with prod 34)] [term 9:REDUCE(with prod 34)]
+ [term 11:REDUCE(with prod 34)] [term 12:REDUCE(with prod 34)]
+ [term 13:REDUCE(with prod 34)] [term 14:REDUCE(with prod 34)]
+ [term 15:REDUCE(with prod 34)]
+From state #46
+ [term 2:REDUCE(with prod 33)] [term 3:REDUCE(with prod 33)]
+ [term 4:REDUCE(with prod 33)] [term 5:REDUCE(with prod 33)]
+ [term 8:SHIFT(to state 41)] [term 9:REDUCE(with prod 33)]
+ [term 11:REDUCE(with prod 33)] [term 12:REDUCE(with prod 33)]
+ [term 13:REDUCE(with prod 33)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 33)]
+From state #47
+ [term 2:REDUCE(with prod 35)] [term 3:REDUCE(with prod 35)]
+ [term 4:REDUCE(with prod 35)] [term 5:REDUCE(with prod 35)]
+ [term 8:REDUCE(with prod 35)] [term 9:REDUCE(with prod 35)]
+ [term 11:REDUCE(with prod 35)] [term 12:REDUCE(with prod 35)]
+ [term 13:REDUCE(with prod 35)] [term 14:REDUCE(with prod 35)]
+ [term 15:REDUCE(with prod 35)]
+From state #48
+ [term 10:SHIFT(to state 49)]
+From state #49
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 11:SHIFT(to state 52)] [term 18:SHIFT(to state 31)]
+ [term 21:SHIFT(to state 34)] [term 22:SHIFT(to state 27)]
+ [term 23:SHIFT(to state 29)] [term 29:SHIFT(to state 26)]
+ [term 34:SHIFT(to state 30)]
+From state #50
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:REDUCE(with prod 47)] [term 13:REDUCE(with prod 47)]
+ [term 14:SHIFT(to state 43)]
+From state #51
+ [term 11:SHIFT(to state 54)] [term 13:SHIFT(to state 53)]
+From state #52
+ [term 2:REDUCE(with prod 37)] [term 3:REDUCE(with prod 37)]
+ [term 4:REDUCE(with prod 37)] [term 5:REDUCE(with prod 37)]
+ [term 8:REDUCE(with prod 37)] [term 9:REDUCE(with prod 37)]
+ [term 11:REDUCE(with prod 37)] [term 12:REDUCE(with prod 37)]
+ [term 13:REDUCE(with prod 37)] [term 14:REDUCE(with prod 37)]
+ [term 15:REDUCE(with prod 37)]
+From state #53
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #54
+ [term 2:REDUCE(with prod 36)] [term 3:REDUCE(with prod 36)]
+ [term 4:REDUCE(with prod 36)] [term 5:REDUCE(with prod 36)]
+ [term 8:REDUCE(with prod 36)] [term 9:REDUCE(with prod 36)]
+ [term 11:REDUCE(with prod 36)] [term 12:REDUCE(with prod 36)]
+ [term 13:REDUCE(with prod 36)] [term 14:REDUCE(with prod 36)]
+ [term 15:REDUCE(with prod 36)]
+From state #55
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:REDUCE(with prod 48)] [term 13:REDUCE(with prod 48)]
+ [term 14:SHIFT(to state 43)]
+From state #56
+ [term 2:REDUCE(with prod 32)] [term 3:REDUCE(with prod 32)]
+ [term 4:SHIFT(to state 42)] [term 5:REDUCE(with prod 32)]
+ [term 8:SHIFT(to state 41)] [term 9:REDUCE(with prod 32)]
+ [term 11:REDUCE(with prod 32)] [term 12:REDUCE(with prod 32)]
+ [term 13:REDUCE(with prod 32)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 32)]
+From state #57
+ [term 2:REDUCE(with prod 31)] [term 3:REDUCE(with prod 31)]
+ [term 4:SHIFT(to state 42)] [term 5:REDUCE(with prod 31)]
+ [term 8:SHIFT(to state 41)] [term 9:REDUCE(with prod 31)]
+ [term 11:REDUCE(with prod 31)] [term 12:REDUCE(with prod 31)]
+ [term 13:REDUCE(with prod 31)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 31)]
+From state #58
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:REDUCE(with prod 29)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:REDUCE(with prod 29)] [term 12:REDUCE(with prod 29)]
+ [term 13:REDUCE(with prod 29)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 29)]
+From state #59
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:REDUCE(with prod 30)]
+ [term 8:SHIFT(to state 41)] [term 9:REDUCE(with prod 30)]
+ [term 11:REDUCE(with prod 30)] [term 12:REDUCE(with prod 30)]
+ [term 13:REDUCE(with prod 30)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 30)]
+From state #60
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:REDUCE(with prod 45)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:REDUCE(with prod 45)] [term 12:REDUCE(with prod 45)]
+ [term 13:REDUCE(with prod 45)] [term 14:SHIFT(to state 43)]
+ [term 15:REDUCE(with prod 45)]
+From state #61
+ [term 6:SHIFT(to state 62)]
+From state #62
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #63
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 12:SHIFT(to state 64)] [term 14:SHIFT(to state 43)]
+From state #64
+ [term 16:REDUCE(with prod 26)] [term 17:REDUCE(with prod 26)]
+ [term 18:REDUCE(with prod 26)] [term 30:REDUCE(with prod 26)]
+ [term 31:REDUCE(with prod 26)] [term 32:REDUCE(with prod 26)]
+ [term 33:REDUCE(with prod 26)] [term 35:REDUCE(with prod 26)]
+From state #65
+ [term 10:SHIFT(to state 70)]
+From state #66
+ [term 14:SHIFT(to state 67)]
+From state #67
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #68
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 14:SHIFT(to state 43)] [term 15:SHIFT(to state 69)]
+From state #69
+ [term 2:REDUCE(with prod 43)] [term 3:REDUCE(with prod 43)]
+ [term 4:REDUCE(with prod 43)] [term 5:REDUCE(with prod 43)]
+ [term 8:REDUCE(with prod 43)] [term 9:REDUCE(with prod 43)]
+ [term 11:REDUCE(with prod 43)] [term 12:REDUCE(with prod 43)]
+ [term 13:REDUCE(with prod 43)] [term 14:REDUCE(with prod 43)]
+ [term 15:REDUCE(with prod 43)]
+From state #70
+ [term 11:SHIFT(to state 71)]
+From state #71
+ [term 2:REDUCE(with prod 44)] [term 3:REDUCE(with prod 44)]
+ [term 4:REDUCE(with prod 44)] [term 5:REDUCE(with prod 44)]
+ [term 8:REDUCE(with prod 44)] [term 9:REDUCE(with prod 44)]
+ [term 11:REDUCE(with prod 44)] [term 12:REDUCE(with prod 44)]
+ [term 13:REDUCE(with prod 44)] [term 14:REDUCE(with prod 44)]
+ [term 15:REDUCE(with prod 44)]
+From state #72
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 12:SHIFT(to state 73)] [term 14:SHIFT(to state 43)]
+From state #73
+ [term 16:REDUCE(with prod 25)] [term 17:REDUCE(with prod 25)]
+ [term 18:REDUCE(with prod 25)] [term 30:REDUCE(with prod 25)]
+ [term 31:REDUCE(with prod 25)] [term 32:REDUCE(with prod 25)]
+ [term 33:REDUCE(with prod 25)] [term 35:REDUCE(with prod 25)]
+From state #74
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #75
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:SHIFT(to state 76)] [term 14:SHIFT(to state 43)]
+From state #76
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 4)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)]
+From state #77
+ [term 31:SHIFT(to state 78)]
+From state #78
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 4)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)]
+From state #79
+ [term 16:REDUCE(with prod 22)] [term 17:REDUCE(with prod 22)]
+ [term 18:REDUCE(with prod 22)] [term 30:REDUCE(with prod 22)]
+ [term 31:REDUCE(with prod 22)] [term 32:REDUCE(with prod 22)]
+ [term 33:REDUCE(with prod 22)] [term 35:REDUCE(with prod 22)]
+From state #80
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #81
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:SHIFT(to state 82)] [term 14:SHIFT(to state 43)]
+From state #82
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 4)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)]
+From state #83
+ [term 16:REDUCE(with prod 24)] [term 17:REDUCE(with prod 24)]
+ [term 18:REDUCE(with prod 24)] [term 30:REDUCE(with prod 24)]
+ [term 31:REDUCE(with prod 24)] [term 32:REDUCE(with prod 24)]
+ [term 33:REDUCE(with prod 24)] [term 35:REDUCE(with prod 24)]
+From state #84
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #85
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 11:SHIFT(to state 86)] [term 14:SHIFT(to state 43)]
+From state #86
+ [term 12:SHIFT(to state 87)]
+From state #87
+ [term 16:REDUCE(with prod 23)] [term 17:REDUCE(with prod 23)]
+ [term 18:REDUCE(with prod 23)] [term 30:REDUCE(with prod 23)]
+ [term 31:REDUCE(with prod 23)] [term 32:REDUCE(with prod 23)]
+ [term 33:REDUCE(with prod 23)] [term 35:REDUCE(with prod 23)]
+From state #88
+ [term 17:SHIFT(to state 89)]
+From state #89
+ [term 0:REDUCE(with prod 2)] [term 24:REDUCE(with prod 2)]
+From state #90
+ [term 16:SHIFT(to state 18)] [term 17:REDUCE(with prod 28)]
+ [term 18:SHIFT(to state 4)] [term 30:SHIFT(to state 22)]
+ [term 32:SHIFT(to state 21)] [term 33:SHIFT(to state 20)]
+ [term 35:REDUCE(with prod 28)]
+From state #91
+ [term 17:SHIFT(to state 92)]
+From state #92
+ [term 16:REDUCE(with prod 21)] [term 17:REDUCE(with prod 21)]
+ [term 18:REDUCE(with prod 21)] [term 30:REDUCE(with prod 21)]
+ [term 31:REDUCE(with prod 21)] [term 32:REDUCE(with prod 21)]
+ [term 33:REDUCE(with prod 21)] [term 35:REDUCE(with prod 21)]
+From state #93
+ [term 17:REDUCE(with prod 27)] [term 35:REDUCE(with prod 27)]
+From state #94
+ [term 0:REDUCE(with prod 0)] [term 24:SHIFT(to state 96)]
+From state #95
+ [term 0:REDUCE(with prod 5)] [term 24:REDUCE(with prod 5)]
+From state #96
+ [term 18:SHIFT(to state 4)]
+From state #97
+ [term 16:SHIFT(to state 98)] [term 36:SHIFT(to state 99)]
+From state #98
+ [term 17:REDUCE(with prod 13)] [term 18:REDUCE(with prod 13)]
+ [term 19:REDUCE(with prod 13)] [term 20:REDUCE(with prod 13)]
+ [term 25:REDUCE(with prod 13)]
+From state #99
+ [term 18:SHIFT(to state 4)]
+From state #100
+ [term 16:SHIFT(to state 101)]
+From state #101
+ [term 17:REDUCE(with prod 13)] [term 18:REDUCE(with prod 13)]
+ [term 19:REDUCE(with prod 13)] [term 20:REDUCE(with prod 13)]
+ [term 25:REDUCE(with prod 13)]
+From state #102
+ [term 17:REDUCE(with prod 10)] [term 18:SHIFT(to state 106)]
+ [term 19:SHIFT(to state 108)] [term 20:SHIFT(to state 107)]
+ [term 25:REDUCE(with prod 10)]
+From state #103
+ [term 18:SHIFT(to state 4)]
+From state #104
+ [term 16:REDUCE(with prod 12)] [term 17:REDUCE(with prod 12)]
+ [term 18:REDUCE(with prod 12)] [term 19:REDUCE(with prod 12)]
+ [term 20:REDUCE(with prod 12)] [term 25:REDUCE(with prod 12)]
+ [term 30:REDUCE(with prod 12)] [term 32:REDUCE(with prod 12)]
+ [term 33:REDUCE(with prod 12)] [term 35:REDUCE(with prod 12)]
+From state #105
+ [term 17:SHIFT(to state 111)] [term 25:SHIFT(to state 113)]
+From state #106
+ [term 18:REDUCE(with prod 20)]
+From state #107
+ [term 18:REDUCE(with prod 18)]
+From state #108
+ [term 14:SHIFT(to state 109)] [term 18:REDUCE(with prod 19)]
+From state #109
+ [term 15:SHIFT(to state 110)]
+From state #110
+ [term 18:REDUCE(with prod 17)]
+From state #111
+ [term 0:REDUCE(with prod 3)] [term 24:REDUCE(with prod 3)]
+From state #112
+ [term 17:REDUCE(with prod 9)] [term 25:REDUCE(with prod 9)]
+From state #113
+ [term 18:SHIFT(to state 106)] [term 19:SHIFT(to state 108)]
+ [term 20:SHIFT(to state 107)]
+From state #114
+ [term 18:SHIFT(to state 4)]
+From state #115
+ [term 10:SHIFT(to state 116)]
+From state #116
+ [term 11:SHIFT(to state 120)] [term 18:SHIFT(to state 106)]
+ [term 19:SHIFT(to state 108)] [term 20:SHIFT(to state 107)]
+From state #117
+ [term 11:SHIFT(to state 131)] [term 13:SHIFT(to state 130)]
+From state #118
+ [term 11:REDUCE(with prod 15)] [term 13:REDUCE(with prod 15)]
+From state #119
+ [term 18:SHIFT(to state 4)]
+From state #120
+ [term 16:SHIFT(to state 121)]
+From state #121
+ [term 16:REDUCE(with prod 13)] [term 18:REDUCE(with prod 13)]
+ [term 19:REDUCE(with prod 13)] [term 20:REDUCE(with prod 13)]
+ [term 30:REDUCE(with prod 13)] [term 32:REDUCE(with prod 13)]
+ [term 33:REDUCE(with prod 13)] [term 35:REDUCE(with prod 13)]
+From state #122
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 124)]
+ [term 19:SHIFT(to state 108)] [term 20:SHIFT(to state 107)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)] [term 35:REDUCE(with prod 28)]
+From state #123
+ [term 35:SHIFT(to state 125)]
+From state #124
+ [term 6:REDUCE(with prod 49)] [term 14:REDUCE(with prod 49)]
+ [term 18:REDUCE(with prod 20)]
+From state #125
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #126
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 12:SHIFT(to state 127)] [term 14:SHIFT(to state 43)]
+From state #127
+ [term 17:SHIFT(to state 128)]
+From state #128
+ [term 17:REDUCE(with prod 8)] [term 25:REDUCE(with prod 8)]
+From state #129
+ [term 11:REDUCE(with prod 14)] [term 13:REDUCE(with prod 14)]
+From state #130
+ [term 18:SHIFT(to state 106)] [term 19:SHIFT(to state 108)]
+ [term 20:SHIFT(to state 107)]
+From state #131
+ [term 16:SHIFT(to state 132)]
+From state #132
+ [term 16:REDUCE(with prod 13)] [term 18:REDUCE(with prod 13)]
+ [term 19:REDUCE(with prod 13)] [term 20:REDUCE(with prod 13)]
+ [term 30:REDUCE(with prod 13)] [term 32:REDUCE(with prod 13)]
+ [term 33:REDUCE(with prod 13)] [term 35:REDUCE(with prod 13)]
+From state #133
+ [term 16:SHIFT(to state 18)] [term 18:SHIFT(to state 124)]
+ [term 19:SHIFT(to state 108)] [term 20:SHIFT(to state 107)]
+ [term 30:SHIFT(to state 22)] [term 32:SHIFT(to state 21)]
+ [term 33:SHIFT(to state 20)] [term 35:REDUCE(with prod 28)]
+From state #134
+ [term 35:SHIFT(to state 135)]
+From state #135
+ [term 7:SHIFT(to state 32)] [term 10:SHIFT(to state 33)]
+ [term 18:SHIFT(to state 31)] [term 21:SHIFT(to state 34)]
+ [term 22:SHIFT(to state 27)] [term 23:SHIFT(to state 29)]
+ [term 29:SHIFT(to state 26)] [term 34:SHIFT(to state 30)]
+From state #136
+ [term 2:SHIFT(to state 39)] [term 3:SHIFT(to state 40)]
+ [term 4:SHIFT(to state 42)] [term 5:SHIFT(to state 38)]
+ [term 8:SHIFT(to state 41)] [term 9:SHIFT(to state 37)]
+ [term 12:SHIFT(to state 137)] [term 14:SHIFT(to state 43)]
+From state #137
+ [term 17:SHIFT(to state 138)]
+From state #138
+ [term 17:REDUCE(with prod 7)] [term 25:REDUCE(with prod 7)]
+From state #139
+ [term 11:REDUCE(with prod 16)] [term 13:REDUCE(with prod 16)]
+From state #140
+ [term 12:SHIFT(to state 141)]
+From state #141
+ [term 16:REDUCE(with prod 11)] [term 17:REDUCE(with prod 11)]
+ [term 18:REDUCE(with prod 11)] [term 19:REDUCE(with prod 11)]
+ [term 20:REDUCE(with prod 11)] [term 25:REDUCE(with prod 11)]
+ [term 30:REDUCE(with prod 11)] [term 32:REDUCE(with prod 11)]
+ [term 33:REDUCE(with prod 11)] [term 35:REDUCE(with prod 11)]
+From state #142
+ [term 17:REDUCE(with prod 10)] [term 18:SHIFT(to state 106)]
+ [term 19:SHIFT(to state 108)] [term 20:SHIFT(to state 107)]
+ [term 25:REDUCE(with prod 10)]
+From state #143
+ [term 17:SHIFT(to state 144)] [term 25:SHIFT(to state 113)]
+From state #144
+ [term 0:REDUCE(with prod 4)] [term 24:REDUCE(with prod 4)]
+From state #145
  [term 0:REDUCE(with prod 1)]
 ------------------------------
 -------- REDUCE_TABLE --------
 From state #0
- [non term 0->state 1] [non term 1->state 3] [non term 2->state 2]
- [non term 3->state 4] [non term 5->state 7]
+ [non term 0->state 1] [non term 1->state 2]
 From state #1
- [non term 1->state 19] [non term 2->state 2] [non term 3->state 4]
- [non term 5->state 7]
 From state #2
+ [non term 3->state 94]
 From state #3
+ [non term 15->state 5]
 From state #4
 From state #5
- [non term 4->state 17]
 From state #6
 From state #7
 From state #8
- [non term 4->state 9]
 From state #9
 From state #10
 From state #11
- [non term 4->state 12]
 From state #12
 From state #13
 From state #14
- [non term 4->state 15]
+ [non term 15->state 15]
 From state #15
 From state #16
 From state #17
+ [non term 11->state 19] [non term 15->state 23]
 From state #18
+ [non term 11->state 90] [non term 12->state 91] [non term 15->state 23]
 From state #19
 From state #20
+From state #21
+From state #22
+From state #23
+From state #24
+ [non term 13->state 72]
+From state #25
+ [non term 13->state 28]
+From state #26
+ [non term 15->state 65]
+From state #27
+From state #28
+From state #29
+From state #30
+From state #31
+From state #32
+ [non term 13->state 60]
+From state #33
+ [non term 13->state 35]
+From state #34
+From state #35
+From state #36
+From state #37
+ [non term 13->state 59]
+From state #38
+ [non term 13->state 58]
+From state #39
+ [non term 13->state 57]
+From state #40
+ [non term 13->state 56]
+From state #41
+ [non term 15->state 48]
+From state #42
+ [non term 13->state 46]
+From state #43
+ [non term 13->state 44]
+From state #44
+From state #45
+From state #46
+From state #47
+From state #48
+From state #49
+ [non term 13->state 50] [non term 14->state 51]
+From state #50
+From state #51
+From state #52
+From state #53
+ [non term 13->state 55]
+From state #54
+From state #55
+From state #56
+From state #57
+From state #58
+From state #59
+From state #60
+From state #61
+From state #62
+ [non term 13->state 63]
+From state #63
+From state #64
+From state #65
+From state #66
+From state #67
+ [non term 13->state 68]
+From state #68
+From state #69
+From state #70
+From state #71
+From state #72
+From state #73
+From state #74
+ [non term 13->state 75]
+From state #75
+From state #76
+ [non term 11->state 77] [non term 15->state 23]
+From state #77
+From state #78
+ [non term 11->state 79] [non term 15->state 23]
+From state #79
+From state #80
+ [non term 13->state 81]
+From state #81
+From state #82
+ [non term 11->state 83] [non term 15->state 23]
+From state #83
+From state #84
+ [non term 13->state 85]
+From state #85
+From state #86
+From state #87
+From state #88
+From state #89
+From state #90
+ [non term 11->state 90] [non term 12->state 93] [non term 15->state 23]
+From state #91
+From state #92
+From state #93
+From state #94
+ [non term 2->state 95]
+From state #95
+From state #96
+ [non term 15->state 97]
+From state #97
+From state #98
+ [non term 7->state 142]
+From state #99
+ [non term 15->state 100]
+From state #100
+From state #101
+ [non term 7->state 102]
+From state #102
+ [non term 5->state 105] [non term 6->state 104] [non term 10->state 103]
+From state #103
+ [non term 15->state 140]
+From state #104
+From state #105
+ [non term 4->state 112]
+From state #106
+From state #107
+From state #108
+From state #109
+From state #110
+From state #111
+From state #112
+From state #113
+ [non term 10->state 114]
+From state #114
+ [non term 15->state 115]
+From state #115
+From state #116
+ [non term 8->state 118] [non term 9->state 117] [non term 10->state 119]
+From state #117
+From state #118
+From state #119
+ [non term 15->state 129]
+From state #120
+From state #121
+ [non term 7->state 122]
+From state #122
+ [non term 6->state 104] [non term 10->state 103] [non term 11->state 90]
+ [non term 12->state 123] [non term 15->state 23]
+From state #123
+From state #124
+From state #125
+ [non term 13->state 126]
+From state #126
+From state #127
+From state #128
+From state #129
+From state #130
+ [non term 8->state 139] [non term 10->state 119]
+From state #131
+From state #132
+ [non term 7->state 133]
+From state #133
+ [non term 6->state 104] [non term 10->state 103] [non term 11->state 90]
+ [non term 12->state 134] [non term 15->state 23]
+From state #134
+From state #135
+ [non term 13->state 136]
+From state #136
+From state #137
+From state #138
+From state #139
+From state #140
+From state #141
+From state #142
+ [non term 5->state 143] [non term 6->state 104] [non term 10->state 103]
+From state #143
+ [non term 4->state 112]
+From state #144
+From state #145
 -----------------------------
 ------- CUP v0.11b 20160615 (GIT 4ac7450) Parser Generation Summary -------
   0 errors and 0 warnings
-  9 terminals, 6 non-terminals, and 11 productions declared, 
-  producing 21 unique parse states.
+  39 terminals, 16 non-terminals, and 50 productions declared, 
+  producing 146 unique parse states.
   0 terminals declared but not used.
   0 non-terminals declared but not used.
   0 productions never reduced.
